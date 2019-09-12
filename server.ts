@@ -14,7 +14,7 @@ dotenv.config({
 
 import { options } from './api/config/swagger';
 
-const userController = require('./api/controllers/users');
+import userController from './api/controllers/users';
 
 const app = express();
 const port = process.env.PORT || 5000;

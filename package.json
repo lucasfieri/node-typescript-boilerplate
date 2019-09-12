@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "set NODE_ENV=dev && nodemon --watch api/**/* --exec ts-node server.ts"
+    "dev": "nodemon --watch 'api/**/*.ts' --exec ts-node server.ts"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +16,10 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "helmet": "^3.18.0",
-    "morgan": "^1.9.1"
+    "knex": "^0.19.4",
+    "morgan": "^1.9.1",
+    "objection": "^1.6.9",
+    "pg": "^7.12.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
