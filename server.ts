@@ -1,3 +1,5 @@
+
+import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import compression from 'compression';
@@ -6,33 +8,42 @@ import morgan from 'morgan';
 import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUiExpress from 'swagger-ui-express';
-import dotenv from 'dotenv';
-
+import { options } from './api/config/swagger';
+import errorHandler from './api/middlewares/errorHandler';
+//Setup .env
 dotenv.config({
   path: '.env.development',
 });
 
-import { options } from './api/config/swagger';
+// Bind all Models to a knex instance using objection.
+import { Model } from 'objection';
+import knex from './api/services/database';
+Model.knex(knex);
 
+//Importing controllers
 import userController from './api/controllers/users';
 
-const app = express();
+//Config Express
+const app = express()
+  .set('etag', false)
+  .set('x-powered-by', false)
+  .enable('trust proxy')
+  .use(compression())
+  .use(helmet())
+  .use(cors())
+  .use(morgan('dev'))
+  .use(bodyParser.json())
+  .use(bodyParser.urlencoded({extended: false}));
+
 const port = process.env.PORT || 5000;
 const swaggerSpec = swaggerJsdoc(options);
 
-app.set('etag', false);
-app.set('x-powered-by', false);
-app.enable('trust proxy');
-app.use(compression());
-app.use(helmet());
-app.use(morgan('dev'));
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false,
-}));
-
+//Using controllers and define routes by path
 app.use('/api-docs', swaggerUiExpress.serve, swaggerUiExpress.setup(swaggerSpec));
 app.use('/api/users', userController);
 
+//Error handler
+app.use(errorHandler);
+
+//Start API
 app.listen(port, () => console.log(`server running at port ${port}`));

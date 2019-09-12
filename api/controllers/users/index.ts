@@ -1,4 +1,8 @@
 import express, { Request, Response } from 'express';
+import { getAllUsers, addUser } from '../../queries/users';
+import { postUserValidator } from '../../utils/validators/users.validators';
+import { checkSchema, validationResult } from 'express-validator';
+import { validate } from '../../utils/validate';
 const router = express.Router();
 
 /**
@@ -26,10 +30,23 @@ const router = express.Router();
  *         description: JWT token and username from client don't match
  */
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
-    return res.status(200).json({ users: 'Foi???' });
+    const { id } = req.params;
+    const users = await getAllUsers(id);
+    return res.status(200).json(users);
   } catch (error) {
+    return res.status(500).json(error);
+  }
+});
+
+router.post('/', postUserValidator,  async (req: Request, res: Response, next) => {
+  try {
+    const { name, password, email, role_id } = req.body;
+    // const users = await addUser({ name, password, email, role_id });
+    return res.status(200).json();
+  } catch (error) {
+    console.log(error)
     return res.status(500).json(error);
   }
 });
